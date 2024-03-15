@@ -1,0 +1,10 @@
+name: runreal
+description: Download runreal and makes available to environment
+author: https://github.com/runreal
+requirements: []
+configuration:
+  properties:
+    version:
+      type: string
+      default: latest
+  additionalProperties: true

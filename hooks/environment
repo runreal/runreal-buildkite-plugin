@@ -1,0 +1,95 @@
+#!/bin/bash
+set -euo pipefail
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+BIN_DIR="$SCRIPT_DIR/../bin"
+
+# https://github.com/runreal/cli/releases/download/v1.0.0/runreal-win-x64.exe
+# https://github.com/runreal/cli/releases/latest/download/runreal-win-x64.exe
+BASE_URL="https://github.com/runreal/cli/releases"
+WINDOWS_BIN="runreal-win-x64.exe"
+LINUX_BIN="runreal-linux-x64"
+MAC_BIN="runreal-macos-arm"
+
+plugin_read_config() {
+    local var="BUILDKITE_PLUGIN_RUNREAL_${1}"
+    local default="${2:-}"
+    echo "${!var:-$default}"
+}
+
+check_installed_version() {
+    if command -v runreal >/dev/null 2>&1; then
+        local installed_version=$(runreal --version | sed 's/\x1b\[[0-9;]*m//g' | awk '{print $2}')
+        echo "${installed_version}"
+    else
+        echo ""
+    fi
+}
+
+get_latest_version() {
+    curl --silent "https://api.github.com/repos/runreal/cli/releases/latest" | 
+    grep '"tag_name":' | 
+    sed -E 's/.*"([^"]+)".*/\1/' |
+    cut -c 2-
+}
+
+download_runreal() {
+    local platform
+    local bin
+    local version=$(plugin_read_config "VERSION" "latest")
+    case "$(uname -s)" in
+        Darwin)
+            platform="mac"
+            save_as="runreal"
+            bin="${MAC_BIN}"
+            ;;
+        Linux)
+            platform="linux"
+            save_as="runreal"
+            bin="${LINUX_BIN}"
+            ;;
+        CYGWIN*|MINGW32*|MSYS*|MINGW*)
+            platform="win"
+            save_as="runreal.exe"
+            bin="${WINDOWS_BIN}"
+            ;;
+        *)
+            echo "unknown: $(uname -s)"
+            exit 1
+            ;;
+    esac
+
+    echo "--- Installing runreal-${version} for ${platform}"
+    if [[ "${version}" == "latest" ]]; then
+        version=$(get_latest_version)
+    fi
+
+    local installed_version=$(check_installed_version)
+    if [[ "${installed_version}" == "${version}" ]]; then
+        echo "runreal-${version} is already installed, skipping download."
+        return
+    fi
+
+    local url="${BASE_URL}/download/v${version}/${bin}"
+    local output_path="$BIN_DIR/${save_as}"
+
+    echo "--- Downloading from ${url}"
+    mkdir -p "$BIN_DIR"
+    curl -L -o "${output_path}" "${url}"
+    chmod +x "${output_path}"
+}
+
+make_available() {
+    echo "--- Adding ${BIN_DIR} to PATH"
+    export PATH="${PATH}:${BIN_DIR}"
+}
+
+test_runreal() {
+    echo "--- Testing runreal"
+    runreal --version
+    runreal --help
+}
+
+make_available
+download_runreal
+test_runreal
