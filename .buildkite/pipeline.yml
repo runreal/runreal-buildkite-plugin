@@ -1,0 +1,41 @@
+steps:
+  - label: install latest
+    commands:
+      - bash ".\tests\expect-version.sh" latest
+    plugins:
+      - runreal/runreal#${BUILDKITE_COMMIT}:
+          version: latest
+  - label: install version
+    commands:
+      - bash ".\tests\expect-version.sh" 1.0.0
+    plugins:
+      - runreal/runreal#${BUILDKITE_COMMIT}:
+          version: 1.0.0
+  - label: install pre-release
+    commands:
+      - bash ".\tests\expect-version.sh" 1.1.1
+    plugins:
+      - runreal/runreal#${BUILDKITE_COMMIT}:
+          version: 1.1.1
+  - label: install from source (branch)
+    commands:
+      - bash ".\tests\expect-version.sh" 1.1.2
+    plugins:
+      - runreal/runreal#${BUILDKITE_COMMIT}:
+          from_source: true
+          from_ref: dev
+  - label: install from source (short ref)
+    commands:
+      - bash ".\tests\expect-version.sh" 1.1.2
+    plugins:
+      - runreal/runreal#${BUILDKITE_COMMIT}:
+          from_source: true
+          from_ref: 659387a
+  - label: install from source (full ref)
+    commands:
+      - bash ".\tests\expect-version.sh" 1.1.2
+    plugins:
+      - runreal/runreal#${BUILDKITE_COMMIT}:
+          from_source: true
+          from_ref: 659387a04d45411b2c4f214da6947f3a4f657afc
+

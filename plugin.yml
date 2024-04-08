@@ -7,4 +7,9 @@ configuration:
     version:
       type: string
       default: latest
+    from_source:
+      type: boolean
+      default: false
+    from_ref:
+      type: string
   additionalProperties: true

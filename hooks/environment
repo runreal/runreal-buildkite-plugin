@@ -59,7 +59,7 @@ download_runreal() {
             ;;
     esac
 
-    echo "--- Installing runreal-${version} for ${platform}"
+    echo "Installing runreal-${version} for ${platform}"
     if [[ "${version}" == "latest" ]]; then
         version=$(get_latest_version)
     fi
@@ -73,23 +73,48 @@ download_runreal() {
     local url="${BASE_URL}/download/v${version}/${bin}"
     local output_path="$BIN_DIR/${save_as}"
 
-    echo "--- Downloading from ${url}"
+    echo "Downloading from ${url}..."
     mkdir -p "$BIN_DIR"
     curl -L -o "${output_path}" "${url}"
     chmod +x "${output_path}"
 }
 
+is_deno_installed() {
+    command -v deno >/dev/null 2>&1
+}
+
+download_from_source() {
+    if !is_deno_installed; then
+        echo "Deno is required to download from source."
+        exit 1
+    fi
+    echo "Downloading from source..."
+    local from_ref=$(plugin_read_config "FROM_REF")
+    deno install -A --force --name runreal "https://raw.githubusercontent.com/runreal/cli/${from_ref}/src/index.ts"
+}
+
+uninstall_source() {
+    if is_deno_installed; then
+        deno uninstall runreal >/dev/null 2>&1 || true
+    fi
+}
+
 make_available() {
-    echo "--- Adding ${BIN_DIR} to PATH"
+    echo "Adding ${BIN_DIR} to PATH"
     export PATH="${PATH}:${BIN_DIR}"
 }
 
-test_runreal() {
-    echo "--- Testing runreal"
-    runreal --version
-    runreal --help
+print_version() {
+    echo "--- :alien: $(runreal --version) installed."
 }
 
+echo "--- :alien: Configuring runreal..."
 make_available
-download_runreal
-test_runreal
+if [[ "$(plugin_read_config "FROM_SOURCE")" == "true" ]]; then
+    download_from_source
+else
+    uninstall_source
+    download_runreal
+fi
+
+print_version
