@@ -90,7 +90,7 @@ download_from_source() {
     fi
     echo "Downloading from source..."
     local from_ref=$(plugin_read_config "FROM_REF")
-    deno install -A --force --name runreal "https://raw.githubusercontent.com/runreal/cli/${from_ref}/src/index.ts"
+    deno install -A --reload --force --name runreal "https://raw.githubusercontent.com/runreal/cli/${from_ref}/src/index.ts"
 }
 
 uninstall_source() {

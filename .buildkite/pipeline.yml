@@ -19,7 +19,7 @@ steps:
           version: 1.1.1
   - label: install from source (branch)
     commands:
-      - bash ".\tests\expect-version.sh" 1.1.2
+      - bash ".\tests\expect-version.sh" 1.1.2-dev
     plugins:
       - runreal/runreal#${BUILDKITE_COMMIT}:
           from_source: true
