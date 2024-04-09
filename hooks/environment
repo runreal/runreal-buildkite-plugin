@@ -84,7 +84,7 @@ is_deno_installed() {
 }
 
 download_from_source() {
-    if !is_deno_installed; then
+    if ! is_deno_installed; then
         echo "Deno is required to download from source."
         exit 1
     fi
