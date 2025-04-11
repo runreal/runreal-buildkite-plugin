@@ -107,7 +107,7 @@ download_from_source() {
     fi
     
     echo "Installing from local repository..."
-    deno install -A --reload --force --global --name runreal "$repo_dir/src/index.ts"
+    deno install -A --reload --force --global --name runreal --config "$repo_dir/deno.jsonc" "$repo_dir/src/index.ts"
 }
 
 uninstall_source() {
