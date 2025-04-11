@@ -3,10 +3,12 @@ set -euo pipefail
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 BIN_DIR="$SCRIPT_DIR/../bin"
+SRC_DIR="$SCRIPT_DIR/../src"
 
 # https://github.com/runreal/cli/releases/download/v1.0.0/runreal-win-x64.exe
 # https://github.com/runreal/cli/releases/latest/download/runreal-win-x64.exe
 BASE_URL="https://github.com/runreal/cli/releases"
+REPO_URL="https://github.com/runreal/cli"
 WINDOWS_BIN="runreal-win-x64.exe"
 LINUX_BIN="runreal-linux-x64"
 MAC_BIN="runreal-macos-arm"
@@ -90,16 +92,22 @@ download_from_source() {
     fi
     echo "Downloading from source..."
     local from_ref=$(plugin_read_config "FROM_REF")
-    local temp_dir=$(mktemp -d)
     
-    echo "Cloning repository to $temp_dir..."
-    git clone https://github.com/runreal/cli.git "$temp_dir"
+    mkdir -p "$SRC_DIR"
+    local repo_dir="$SRC_DIR/cli"
     
-    echo "Checking out ref: ${from_ref}..."
-    (cd "$temp_dir" && git checkout "$from_ref")
+    if [ -d "$repo_dir" ]; then
+        echo "Repository directory already exists, updating..."
+        (cd "$repo_dir" && git fetch && git clean -fxd && git checkout "$from_ref")
+    else
+        echo "Cloning repository to $repo_dir..."
+        git clone "$REPO_URL" "$repo_dir"
+        echo "Checking out ref: ${from_ref}..."
+        (cd "$repo_dir" && git checkout "$from_ref")
+    fi
     
     echo "Installing from local repository..."
-    deno install -A --reload --force --global --name runreal "$temp_dir/src/index.ts"
+    deno install -A --reload --force --global --name runreal "$repo_dir/src/index.ts"
 }
 
 uninstall_source() {
