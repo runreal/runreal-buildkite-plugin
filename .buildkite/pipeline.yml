@@ -29,16 +29,16 @@ steps:
           from_ref: test-fixture-branch
   - label: install from source (short ref)
     commands:
-      - bash ".\tests\expect-version.sh" 1.1.2
+      - bash ".\tests\expect-version.sh" 1.4.1
     plugins:
       - runreal/runreal#${BUILDKITE_COMMIT}:
           from_source: true
-          from_ref: 659387a
+          from_ref: 5b1a952
   - label: install from source (full ref)
     commands:
-      - bash ".\tests\expect-version.sh" 1.1.2
+      - bash ".\tests\expect-version.sh" 1.4.1
     plugins:
       - runreal/runreal#${BUILDKITE_COMMIT}:
           from_source: true
-          from_ref: 659387a04d45411b2c4f214da6947f3a4f657afc
+          from_ref: 5b1a9524de17b9ae5c21a9feb6dd2d633f4a4c04
 
