@@ -112,7 +112,7 @@ download_from_source() {
 
 uninstall_source() {
     if is_deno_installed; then
-        deno uninstall runreal >/dev/null 2>&1 || true
+        deno uninstall --global runreal >/dev/null 2>&1 || true
     fi
 }
 
