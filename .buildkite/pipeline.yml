@@ -10,16 +10,16 @@ steps:
           version: latest
   - label: install version
     commands:
-      - bash ".\tests\expect-version.sh" 1.3.0
+      - bash ".\tests\expect-version.sh" 1.4.0
     plugins:
       - runreal/runreal#${BUILDKITE_COMMIT}:
-          version: 1.3.0
+          version: 1.4.0
   - label: install pre-release
     commands:
       - bash ".\tests\expect-version.sh" 1.4.1
     plugins:
       - runreal/runreal#${BUILDKITE_COMMIT}:
-          version: 1.4.2
+          version: 1.4.1
   - label: install from source (branch)
     commands:
       - bash ".\tests\expect-version.sh" 1.4.1
